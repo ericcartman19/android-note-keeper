@@ -6,13 +6,14 @@ import java.util.List;
 /**
  * Created by Jim.
  */
-
+// DataManager es un singleton
 public class DataManager {
     private static DataManager ourInstance = null;
 
     private List<CourseInfo> mCourses = new ArrayList<>();
     private List<NoteInfo> mNotes = new ArrayList<>();
 
+    // singleton implementation
     public static DataManager getInstance() {
         if(ourInstance == null) {
             ourInstance = new DataManager();
