@@ -1,5 +1,6 @@
 package com.demo.valoyes.notekeeper;
 
+import android.content.Intent;
 import android.opengl.EGLExt;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -7,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -41,9 +43,20 @@ public class NoteListActivity extends AppCompatActivity {
         ListView listNotess = (ListView) findViewById(R.id.list_notes);
 
         List<NoteInfo> notes =  DataManager.getInstance().getNotes();
-        ArrayAdapter<NoteInfo> adapterNotes = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+        ArrayAdapter<NoteInfo> adapterNotes = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notes);
 
         listNotess.setAdapter(adapterNotes);
+
+        // add listener
+        listNotess.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                // un intent identifica la activity que queremos crear o lanzar
+                /// tenemos que utilizar NoteListActivity.this porque estamos en una clase anonima
+                Intent intent = new Intent(NoteListActivity.this, NoteActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
 }
