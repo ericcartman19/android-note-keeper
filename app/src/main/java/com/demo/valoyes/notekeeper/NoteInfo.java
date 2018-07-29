@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by Jim.
  */
 
-public final class NoteInfo {
+public final class NoteInfo implements Parcelable {
     private CourseInfo mCourse;
     private String mTitle;
     private String mText;
@@ -16,6 +16,15 @@ public final class NoteInfo {
         mCourse = course;
         mTitle = title;
         mText = text;
+    }
+
+    // una de las utilidades de hacer constructores private es cuando los utilizamos para dar
+    // valores a fields que son FINAL
+    private NoteInfo(Parcel source) {
+        // el orden es secuencial cuando leemos los valores almacenados en el parcelable object
+        mCourse = source.readParcelable(CourseInfo.class.getClassLoader());
+        mTitle = source.readString();
+        mText = source.readString();
     }
 
     public CourseInfo getCourse() {
@@ -66,4 +75,39 @@ public final class NoteInfo {
         return getCompareKey();
     }
 
+    @Override
+    public int describeContents() {
+        // debido a que no tenemos necesidades especiales de parcelling
+        // debajos a 0 el return value de este metodo
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel destinationObject, int i) {
+        // este metodo es responsble de escribir el member info
+        // en el Parcelable object
+
+        // este metodo permite meter PARCELABLE en nuestro PARCELABLE
+        destinationObject.writeParcelable(mCourse, 0);
+
+        destinationObject.writeString(mTitle);
+        destinationObject.writeString(mText);
+    }
+
+    // TODO : guarrada de anoynomous class, convertirlo a lambda
+    public final static Parcelable.Creator<NoteInfo> CREATOR
+            = new Parcelable.Creator<NoteInfo>(){
+
+        @Override
+        public NoteInfo createFromParcel(Parcel source) {
+            // permite crear una nueva instancia de nuestro tipo
+            // y meter todos los valores dentro
+            return new NoteInfo(source);
+        }
+
+        @Override
+        public NoteInfo[] newArray(int size) {
+            return new NoteInfo[size];
+        }
+    };
 }
