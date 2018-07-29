@@ -22,6 +22,7 @@ public class NoteActivity extends AppCompatActivity {
     // la procedencia de informacion puede ser muy variada
     public static final String NOTE_INFO = "com.demo.valoyes.notekeeper.NOTE_INFO";
     private NoteInfo mNote;
+    private boolean mIsNewNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +51,10 @@ public class NoteActivity extends AppCompatActivity {
         EditText textNoteTitle = (EditText) findViewById(R.id.text_note_title);
         EditText textNoteText = (EditText) findViewById(R.id.text_note_text);
 
-        // mostramos la informacion recuperada del intent
-        displayNote(spinnerCourses, textNoteTitle, textNoteText);
+        // mostramos la informacion recuperada del intent o creamos una nueva note
+        if(!mIsNewNote){
+            displayNote(spinnerCourses, textNoteTitle, textNoteText);
+        }
     }
 
     // metodo encargado de mostrar la informacion recuperada del intent
@@ -71,6 +74,10 @@ public class NoteActivity extends AppCompatActivity {
     private void readDisplayStateValue() {
         Intent intent = getIntent();
         mNote = intent.getParcelableExtra(NOTE_INFO);
+
+        // determinamos si estamos creando una nueva note o mostrando una existente
+        // para esto nos basamos en la informacion que recuperamos del intent, ie, mNote
+        mIsNewNote = mNote == null;
     }
 
     @Override

@@ -36,7 +36,7 @@ public class NoteListActivity extends AppCompatActivity {
             // basicament lo unico que queremos en este caso es crear un intent
             // y llamar startActivity
             // sin embargo todo esto se puede resumir a una unica linea de codigo, like this:
-            startActivity(new Intent(NoteListActivity.this, NoteListActivity.class));
+            startActivity(new Intent(NoteListActivity.this, NoteActivity.class));
         });
 
         initializeDisplayContent();
