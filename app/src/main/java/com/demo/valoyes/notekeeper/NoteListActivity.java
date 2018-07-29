@@ -40,7 +40,7 @@ public class NoteListActivity extends AppCompatActivity {
     // luego trataremos el user-selection, es decir cuando el usuario haga click en una note
     // quereemos lanzar nuestro NoteActivity la cual va a mostrar la note en cuestion
     private void initializeDisplayContent() {
-        ListView listNotess = (ListView) findViewById(R.id.list_notes);
+        final ListView listNotess = (ListView) findViewById(R.id.list_notes);
 
         List<NoteInfo> notes =  DataManager.getInstance().getNotes();
         ArrayAdapter<NoteInfo> adapterNotes = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notes);
@@ -60,6 +60,8 @@ public class NoteListActivity extends AppCompatActivity {
 
         listNotess.setOnItemClickListener( (parent, view, position, id) -> {
                 Intent intent = new Intent(NoteListActivity.this, NoteActivity.class);
+                NoteInfo note = (NoteInfo) listNotess.getItemAtPosition(position);
+                intent.putExtra(NoteActivity.NOTE_INFO, note);
                 startActivity(intent);
 
         });

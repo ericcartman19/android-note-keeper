@@ -14,6 +14,10 @@ import android.widget.Spinner;
 import java.util.List;
 
 public class NoteActivity extends AppCompatActivity {
+    // esta constante la creamos para
+    // identificamos la constante de la manera mas especifica posible debido a que
+    // la procedencia de informacion puede ser muy variada
+    public static final String NOTE_INFO = "com.demo.valoyes.notekeeper.NOTE_INFO";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
