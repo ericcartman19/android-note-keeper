@@ -22,6 +22,13 @@ public final class ModuleInfo {
         mIsComplete = isComplete;
     }
 
+    private ModuleInfo(Parcel source){
+        mModuleId = source.readString();
+        mTitle = source.readString();
+        mIsComplete = source.readByte() == 1;
+
+    }
+
     public String getModuleId() {
         return mModuleId;
     }

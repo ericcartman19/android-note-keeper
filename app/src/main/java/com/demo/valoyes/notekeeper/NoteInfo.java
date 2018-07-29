@@ -89,7 +89,6 @@ public final class NoteInfo implements Parcelable {
 
         // este metodo permite meter PARCELABLE en nuestro PARCELABLE
         destinationObject.writeParcelable(mCourse, 0);
-
         destinationObject.writeString(mTitle);
         destinationObject.writeString(mText);
     }
