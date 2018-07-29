@@ -2,6 +2,7 @@ package com.demo.valoyes.notekeeper;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 import java.util.List;
@@ -31,7 +33,7 @@ public class NoteActivity extends AppCompatActivity {
         // el fab lo hemos quitado, borramos este codigo
 
         // nos quedamos con la referencia a nuestro spinner
-        Spinner spinnerCourser = (Spinner) findViewById(R.id.spinner_courses);
+        Spinner spinnerCourses = (Spinner) findViewById(R.id.spinner_courses);
 
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
         // pasamos la activity actual como contexto
@@ -39,12 +41,33 @@ public class NoteActivity extends AppCompatActivity {
         ArrayAdapter<CourseInfo> adapterCourses = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, courses);
         // ahora vamos a gestionar el drop down
         adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerCourser.setAdapter(adapterCourses);
+        spinnerCourses.setAdapter(adapterCourses);
 
         // procedemos a extraer la informacion del intent
         readDisplayStateValue();
+
+        // sacamos a las referencia a los editTextView
+        EditText textNoteTitle = (EditText) findViewById(R.id.text_note_title);
+        EditText textNoteText = (EditText) findViewById(R.id.text_note_text);
+
+        // mostramos la informacion recuperada del intent
+        displayNote(spinnerCourses, textNoteTitle, textNoteText);
     }
 
+    // metodo encargado de mostrar la informacion recuperada del intent
+    private void displayNote(Spinner spinnerCourses, EditText textNoteTitle, EditText textNoteText) {
+        // recuperamos los cursos desde nueso DataManager
+        List<CourseInfo> courses = DataManager.getInstance().getCourses();
+        // recuperamos el index que nos interesa desde mNote (esto proviene del intent)
+        int courseIndex = courses.indexOf(mNote.getCourse());
+        // indicamos el index que nos interesa seleccionar en el spinner
+        spinnerCourses.setSelection(courseIndex);
+        // mostramos el resto de la informacion en los editTextView
+        textNoteTitle.setText(mNote.getTitle());
+        textNoteText.setText(mNote.getText());
+    }
+
+    // metodo encargado de extraer informacion del intent y meterlo en una variable local
     private void readDisplayStateValue() {
         Intent intent = getIntent();
         mNote = intent.getParcelableExtra(NOTE_INFO);
