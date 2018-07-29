@@ -23,13 +23,20 @@ public class NoteListActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // utilizamos el FAB button para crear una nueva note
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
+        fab.setOnClickListener( (view) -> {
+            // basicament lo unico que queremos en este caso es crear un intent
+            // y llamar startActivity
+            // sin embargo todo esto se puede resumir a una unica linea de codigo, like this:
+            startActivity(new Intent(NoteListActivity.this, NoteListActivity.class));
         });
 
         initializeDisplayContent();
