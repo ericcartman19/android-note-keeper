@@ -48,15 +48,23 @@ public class NoteListActivity extends AppCompatActivity {
         listNotess.setAdapter(adapterNotes);
 
         // add listener
-        listNotess.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                // un intent identifica la activity que queremos crear o lanzar
-                /// tenemos que utilizar NoteListActivity.this porque estamos en una clase anonima
+//        listNotess.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                // un intent identifica la activity que queremos crear o lanzar
+//                /// tenemos que utilizar NoteListActivity.this porque estamos en una clase anonima
+//                Intent intent = new Intent(NoteListActivity.this, NoteActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+
+        listNotess.setOnItemClickListener( (parent, view, position, id) -> {
                 Intent intent = new Intent(NoteListActivity.this, NoteActivity.class);
                 startActivity(intent);
-            }
+
         });
+
+
     }
 
 }
