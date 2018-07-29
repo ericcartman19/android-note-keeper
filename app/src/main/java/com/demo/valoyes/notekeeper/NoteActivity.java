@@ -1,5 +1,6 @@
 package com.demo.valoyes.notekeeper;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -18,6 +19,7 @@ public class NoteActivity extends AppCompatActivity {
     // identificamos la constante de la manera mas especifica posible debido a que
     // la procedencia de informacion puede ser muy variada
     public static final String NOTE_INFO = "com.demo.valoyes.notekeeper.NOTE_INFO";
+    private NoteInfo mNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,14 @@ public class NoteActivity extends AppCompatActivity {
         // ahora vamos a gestionar el drop down
         adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCourser.setAdapter(adapterCourses);
+
+        // procedemos a extraer la informacion del intent
+        readDisplayStateValue();
+    }
+
+    private void readDisplayStateValue() {
+        Intent intent = getIntent();
+        mNote = intent.getParcelableExtra(NOTE_INFO);
     }
 
     @Override
