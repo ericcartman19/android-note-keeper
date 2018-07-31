@@ -20,7 +20,9 @@ public class NoteActivity extends AppCompatActivity {
     // esta constante la creamos para
     // identificamos la constante de la manera mas especifica posible debido a que
     // la procedencia de informacion puede ser muy variada
-    public static final String NOTE_INFO = "com.demo.valoyes.notekeeper.NOTE_INFO";
+    // public static final String NOTE_INFO = "com.demo.valoyes.notekeeper.NOTE_INFO";
+    public static final String NOTE_POSITION = "com.demo.valoyes.notekeeper.NOTE_POSITION";
+    public static final int POSITION_NOT_SET = -1;
     private NoteInfo mNote;
     private boolean mIsNewNote;
 
@@ -73,11 +75,18 @@ public class NoteActivity extends AppCompatActivity {
     // metodo encargado de extraer informacion del intent y meterlo en una variable local
     private void readDisplayStateValue() {
         Intent intent = getIntent();
-        mNote = intent.getParcelableExtra(NOTE_INFO);
+        // mNote = intent.getParcelableExtra(NOTE_POSITION);
+        // hay que especificar un valor por defecto, debido a que los tipos primitivos
+        // no tienen null como valor por defecto
+        int position = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
 
         // determinamos si estamos creando una nueva note o mostrando una existente
         // para esto nos basamos en la informacion que recuperamos del intent, ie, mNote
-        mIsNewNote = mNote == null;
+        // mIsNewNote = mNote == null;
+        mIsNewNote = position == POSITION_NOT_SET;
+        if(!mIsNewNote){
+            mNote = DataManager.getInstance().getNotes().get(position);
+        }
     }
 
     @Override

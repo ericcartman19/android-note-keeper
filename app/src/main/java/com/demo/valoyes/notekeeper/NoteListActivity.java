@@ -49,9 +49,11 @@ public class NoteListActivity extends AppCompatActivity {
     private void initializeDisplayContent() {
         final ListView listNotess = (ListView) findViewById(R.id.list_notes);
 
+        // obtenemos todas las notes del DataManager, el cual es un SINGLETON
         List<NoteInfo> notes =  DataManager.getInstance().getNotes();
+        // luego cargamos esta informacion en un Adapter
         ArrayAdapter<NoteInfo> adapterNotes = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notes);
-
+        // con la informacion del adapter populamos el ListView
         listNotess.setAdapter(adapterNotes);
 
         // add listener
@@ -65,10 +67,18 @@ public class NoteListActivity extends AppCompatActivity {
 //            }
 //        });
 
+        // cuando el usuario hace una selection (click) en la lista
+        // entre la informacion que recibimos esta la posicion de la nota dentro de la lista
         listNotess.setOnItemClickListener( (parent, view, position, id) -> {
                 Intent intent = new Intent(NoteListActivity.this, NoteActivity.class);
-                NoteInfo note = (NoteInfo) listNotess.getItemAtPosition(position);
-                intent.putExtra(NoteActivity.NOTE_INFO, note);
+                // obtebenis la nota a partir de la position que recibimos en el evento
+                // NoteInfo note = (NoteInfo) listNotess.getItemAtPosition(position);
+                // dicha nota la mentemos en el intent, utilizando PARCELABLE (NoteInfo lo impelmenta)
+                // intent.putExtra(NoteActivity.NOTE_INFO, note);
+                // debido a que las acitivies se ejecutan en el mismo PROCESS, ambas puedden
+                // acceder directamente al DataManger(singleton) y no es necesario meter el
+                // PARCELABLE en el intent
+                intent.putExtra(NoteActivity.NOTE_POSITION, position);
                 startActivity(intent);
 
         });
