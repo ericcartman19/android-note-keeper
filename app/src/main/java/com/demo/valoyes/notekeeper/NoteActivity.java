@@ -27,6 +27,9 @@ public class NoteActivity extends AppCompatActivity {
     private int mNotePosition;
     private boolean mIsCancelling;
     private ArrayAdapter<CourseInfo> mAdapterCourses;
+    private String mOriginalNoteCourseId;
+    private String mOriginalNoteTitle;
+    private String mOriginalNoteText;
 
     @Override
     protected void onResume() {
@@ -55,6 +58,8 @@ public class NoteActivity extends AppCompatActivity {
 
         // procedemos a extraer la informacion del intent
         readDisplayStateValue();
+        //
+        saveOriginalNoteValues();
 
         // sacamos a las referencia a los editTextView
         mTextNoteTitle = (EditText) findViewById(R.id.text_note_title);
@@ -63,6 +68,16 @@ public class NoteActivity extends AppCompatActivity {
         // mostramos la informacion recuperada del intent o creamos una nueva note
         if(!mIsNewNote){
             displayNote(mSpinnerCourses, mTextNoteTitle, mTextNoteText);
+        }
+    }
+
+    // permite guardar la nota tal cual estaba en el momento en que se creó la ACTIVITY
+    private void saveOriginalNoteValues() {
+        if(!mIsNewNote){
+            // salvar todos los valores de la Note
+            mOriginalNoteCourseId = mNote.getCourse().getCourseId();
+            mOriginalNoteTitle = mNote.getCourse().getTitle();
+            mOriginalNoteText = mNote.getText();
         }
     }
 
@@ -141,13 +156,23 @@ public class NoteActivity extends AppCompatActivity {
         super.onPause();
         // realizamos la action de salvar el trabajo del usuario en onPause
         // metodo de ACTIVITY que es llamado cuando el usuario deja la ACTIVITY
-        if(!mIsCancelling) {
+        if(mIsCancelling){
+            if(mIsNewNote){
+                DataManager.getInstance().removeNote(mNotePosition);
+            }else{
+                // recuperamos los valores originales de la note no nueva
+                storePreviousNoteValues();
+            }
+        }else{
             saveNote();
-        }else if(mIsCancelling && mIsNewNote){
-            // en caso que salgamos de la activity no queremos guardar la informacion
-            // y la nota ademas es nueva
-            DataManager.getInstance().removeNote(mNotePosition);
         }
+    }
+
+    private void storePreviousNoteValues() {
+        CourseInfo course = DataManager.getInstance().getCourse(mOriginalNoteCourseId);
+        mNote.setCourse(course);
+        mNote.setTitle(mOriginalNoteTitle);
+        mNote.setText(mOriginalNoteText);
     }
 
     // procedemos a guardar toda la informacion concerniente la actividad en curso del usuario
@@ -164,7 +189,7 @@ public class NoteActivity extends AppCompatActivity {
         CourseInfo course = (CourseInfo) mSpinnerCourses.getSelectedItem();
         String subject = mTextNoteTitle.getText().toString();
         String text = "Checkout what I learned in the Pluralsight course \"" + course.getTitle()
-                + "\"\n " + mTextNoteTitle.getText().toString();
+                + "\"\n " + mTextNoteText.getText().toString();
 
         // creo un Intent asociado con el envio de un mail
         Intent intent = new Intent(Intent.ACTION_SEND);
