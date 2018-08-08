@@ -2,12 +2,8 @@ package com.demo.valoyes.notekeeper;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -25,6 +21,17 @@ public class NoteActivity extends AppCompatActivity {
     public static final int POSITION_NOT_SET = -1;
     private NoteInfo mNote;
     private boolean mIsNewNote;
+    private Spinner mSpinnerCourses;
+    private EditText mTextNoteTitle;
+    private EditText mTextNoteText;
+    private int mNotePosition;
+    private boolean mIsCancelling;
+    private ArrayAdapter<CourseInfo> mAdapterCourses;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,26 +43,26 @@ public class NoteActivity extends AppCompatActivity {
         // el fab lo hemos quitado, borramos este codigo
 
         // nos quedamos con la referencia a nuestro spinner
-        Spinner spinnerCourses = (Spinner) findViewById(R.id.spinner_courses);
+        mSpinnerCourses = (Spinner) findViewById(R.id.spinner_courses);
 
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
         // pasamos la activity actual como contexto
         // configuramos el spinner
-        ArrayAdapter<CourseInfo> adapterCourses = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, courses);
+        mAdapterCourses = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, courses);
         // ahora vamos a gestionar el drop down
-        adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerCourses.setAdapter(adapterCourses);
+        mAdapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerCourses.setAdapter(mAdapterCourses);
 
         // procedemos a extraer la informacion del intent
         readDisplayStateValue();
 
         // sacamos a las referencia a los editTextView
-        EditText textNoteTitle = (EditText) findViewById(R.id.text_note_title);
-        EditText textNoteText = (EditText) findViewById(R.id.text_note_text);
+        mTextNoteTitle = (EditText) findViewById(R.id.text_note_title);
+        mTextNoteText = (EditText) findViewById(R.id.text_note_text);
 
         // mostramos la informacion recuperada del intent o creamos una nueva note
         if(!mIsNewNote){
-            displayNote(spinnerCourses, textNoteTitle, textNoteText);
+            displayNote(mSpinnerCourses, mTextNoteTitle, mTextNoteText);
         }
     }
 
@@ -73,6 +80,7 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     // metodo encargado de extraer informacion del intent y meterlo en una variable local
+    // tambien gestionaremos aqui, salvar los datod de una nueva activity
     private void readDisplayStateValue() {
         Intent intent = getIntent();
         // mNote = intent.getParcelableExtra(NOTE_POSITION);
@@ -86,16 +94,27 @@ public class NoteActivity extends AppCompatActivity {
         mIsNewNote = position == POSITION_NOT_SET;
         if(!mIsNewNote){
             mNote = DataManager.getInstance().getNotes().get(position);
+        }else{
+            // en el caso de una new note
+            createNewNote();
         }
+    }
+
+    private void createNewNote() {
+        DataManager dm = DataManager.getInstance();
+        mNotePosition = dm.createNewNote();
+        // nos da la position donde se ha creado la nueva note
+        mNote = dm.getNotes().get(mNotePosition);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_note, menu);
         return true;
     };
 
+    // este es el metodo que es invocada cada vez que el usuario selecciona una opcion del menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -104,10 +123,58 @@ public class NoteActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_send_mail) {
+            sendEmail();
             return true;
+        }else if(id == R.id.action_cancel){
+            // flag para indicar si cancelamos la activity
+            mIsCancelling = true;
+            // como parte del exiting process el metodo onPause va a ser invovocado
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // realizamos la action de salvar el trabajo del usuario en onPause
+        // metodo de ACTIVITY que es llamado cuando el usuario deja la ACTIVITY
+        if(!mIsCancelling) {
+            saveNote();
+        }else if(mIsCancelling && mIsNewNote){
+            // en caso que salgamos de la activity no queremos guardar la informacion
+            // y la nota ademas es nueva
+            DataManager.getInstance().removeNote(mNotePosition);
+        }
+    }
+
+    // procedemos a guardar toda la informacion concerniente la actividad en curso del usuario
+    private void saveNote() {
+        // recuperamos cualquier cualquiera sea la nota que haya seleccionado el usuario
+        mNote.setCourse((CourseInfo) mSpinnerCourses.getSelectedItem());
+        // buscamos los valos que estan en los editText
+        mNote.setTitle(mTextNoteTitle.getText().toString());
+        mNote.setText(mTextNoteText.getText().toString());
+    }
+
+    private void sendEmail() {
+        // titulo y contenido del mail
+        CourseInfo course = (CourseInfo) mSpinnerCourses.getSelectedItem();
+        String subject = mTextNoteTitle.getText().toString();
+        String text = "Checkout what I learned in the Pluralsight course \"" + course.getTitle()
+                + "\"\n " + mTextNoteTitle.getText().toString();
+
+        // creo un Intent asociado con el envio de un mail
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        // MIMTE TYPE for email messages, standard internet mime type
+        intent.setType("message/rfc822");
+        // el subject y el text sera provisto por el usuario y lo metemos en el extra
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_TEXT, text);
+
+        // lanzamos la activity con el Intent
+        startActivity(intent);
     }
 }

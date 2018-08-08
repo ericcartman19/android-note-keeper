@@ -16,6 +16,8 @@ import java.util.List;
 
 public class NoteListActivity extends AppCompatActivity {
 
+    private ArrayAdapter<NoteInfo> mAdapterNotes;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +44,16 @@ public class NoteListActivity extends AppCompatActivity {
         initializeDisplayContent();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // necesito hacer saber al arrayAdapter que los datos/informacion han cambiado
+        // de esta manera cada vez que la NoteListActivity vuelve al primer plano
+        // esta avisada de prepararse para posible nuevas Note que hayamos creado
+        mAdapterNotes.notifyDataSetChanged();
+
+    }
+
     // popula nuestro listView de una manera muy similar a la manera como el spinner se asociaba a
     // los cursos
     // luego trataremos el user-selection, es decir cuando el usuario haga click en una note
@@ -52,9 +64,9 @@ public class NoteListActivity extends AppCompatActivity {
         // obtenemos todas las notes del DataManager, el cual es un SINGLETON
         List<NoteInfo> notes =  DataManager.getInstance().getNotes();
         // luego cargamos esta informacion en un Adapter
-        ArrayAdapter<NoteInfo> adapterNotes = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notes);
+        mAdapterNotes = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, notes);
         // con la informacion del adapter populamos el ListView
-        listNotess.setAdapter(adapterNotes);
+        listNotess.setAdapter(mAdapterNotes);
 
         // add listener
 //        listNotess.setOnItemClickListener(new AdapterView.OnItemClickListener() {
