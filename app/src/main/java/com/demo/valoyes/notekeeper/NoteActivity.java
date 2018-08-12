@@ -18,6 +18,11 @@ public class NoteActivity extends AppCompatActivity {
     // la procedencia de informacion puede ser muy variada
     // public static final String NOTE_INFO = "com.demo.valoyes.notekeeper.NOTE_INFO";
     public static final String NOTE_POSITION = "com.demo.valoyes.notekeeper.NOTE_POSITION";
+    // keys para informacion que vamos a guardar en el BUNDLE
+    public static final String ORIGINAL_NOTE_COURSE_ID = "com.demo.valoyes.notekeeper.ORIGINAL_NOTE_COURSE_ID";
+    public static final String ORIGINAL_NOTE_TITLE = "com.demo.valoyes.notekeeper.ORIGINAL_NOTE_TITLE";
+    public static final String ORIGINAL_NOTE_TEXT = "com.demo.valoyes.notekeeper.ORIGINAL_NOTE_TEXT";
+
     public static final int POSITION_NOT_SET = -1;
     private NoteInfo mNote;
     private boolean mIsNewNote;
@@ -58,8 +63,17 @@ public class NoteActivity extends AppCompatActivity {
 
         // procedemos a extraer la informacion del intent
         readDisplayStateValue();
-        //
-        saveOriginalNoteValues();
+
+        // salvamos los valores de la Activity en el momento en que se crea
+        // es decir, cuando el BUNDLE es null
+        // esto tambien incluye cuando una ACTIVITY ha sido destruida precedentemenete
+        // y se vuelve a crear
+        if(savedInstanceState == null) {
+            saveOriginalNoteValues();
+        }else{
+            // sino es null, es decir si la ACTIVITY ya existe queremos
+            restoreOriginalNoteValues(savedInstanceState);
+        }
 
         // sacamos a las referencia a los editTextView
         mTextNoteTitle = (EditText) findViewById(R.id.text_note_title);
@@ -69,6 +83,12 @@ public class NoteActivity extends AppCompatActivity {
         if(!mIsNewNote){
             displayNote(mSpinnerCourses, mTextNoteTitle, mTextNoteText);
         }
+    }
+
+    private void restoreOriginalNoteValues(Bundle savedInstanceState) {
+        mOriginalNoteCourseId = savedInstanceState.getString(ORIGINAL_NOTE_COURSE_ID);
+        mOriginalNoteTitle = savedInstanceState.getString(ORIGINAL_NOTE_TITLE);
+        mOriginalNoteText = savedInstanceState.getString(ORIGINAL_NOTE_TEXT);
     }
 
     // permite guardar la nota tal cual estaba en el momento en que se creó la ACTIVITY
@@ -201,5 +221,16 @@ public class NoteActivity extends AppCompatActivity {
 
         // lanzamos la activity con el Intent
         startActivity(intent);
+    }
+
+    // en este metodo nos encargamos de meter en el BUNDLE la informacion que queremos
+    // persisitir en el momento que destruimos la ACTIVITY, si las llaves ya existen en el
+    // BUNDLE, los valores son sobreescritos
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(ORIGINAL_NOTE_COURSE_ID, mOriginalNoteCourseId);
+        outState.putString(ORIGINAL_NOTE_TITLE, mOriginalNoteTitle);
+        outState.putString(ORIGINAL_NOTE_TEXT, mOriginalNoteText);
     }
 }
