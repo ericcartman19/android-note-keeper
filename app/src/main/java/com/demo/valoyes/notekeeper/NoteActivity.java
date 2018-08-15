@@ -121,25 +121,25 @@ public class NoteActivity extends AppCompatActivity {
         // mNote = intent.getParcelableExtra(NOTE_POSITION);
         // hay que especificar un valor por defecto, debido a que los tipos primitivos
         // no tienen null como valor por defecto
-        int position = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
+        mNotePosition = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
 
         // determinamos si estamos creando una nueva note o mostrando una existente
         // para esto nos basamos en la informacion que recuperamos del intent, ie, mNote
         // mIsNewNote = mNote == null;
-        mIsNewNote = position == POSITION_NOT_SET;
-        if(!mIsNewNote){
-            mNote = DataManager.getInstance().getNotes().get(position);
-        }else{
+        mIsNewNote = mNotePosition == POSITION_NOT_SET;
+        if(mIsNewNote){
             // en el caso de una new note
             createNewNote();
         }
+
+        mNote = DataManager.getInstance().getNotes().get(mNotePosition);
     }
 
     private void createNewNote() {
         DataManager dm = DataManager.getInstance();
         mNotePosition = dm.createNewNote();
         // nos da la position donde se ha creado la nueva note
-        mNote = dm.getNotes().get(mNotePosition);
+        // mNote = dm.getNotes().get(mNotePosition);
     }
 
     @Override
