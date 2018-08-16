@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -13,6 +14,9 @@ import android.widget.Spinner;
 import java.util.List;
 
 public class NoteActivity extends AppCompatActivity {
+    // haremos esto en vez de poner un literal con el nombre de la clase
+    private final String TAG = getClass().getSimpleName();
+
     // esta constante la creamos para
     // identificamos la constante de la manera mas especifica posible debido a que
     // la procedencia de informacion puede ser muy variada
@@ -83,6 +87,7 @@ public class NoteActivity extends AppCompatActivity {
         if(!mIsNewNote){
             displayNote(mSpinnerCourses, mTextNoteTitle, mTextNoteText);
         }
+        Log.d(TAG, "Creating Activity....");
     }
 
     private void restoreOriginalNoteValues(Bundle savedInstanceState) {
@@ -132,6 +137,7 @@ public class NoteActivity extends AppCompatActivity {
             createNewNote();
         }
 
+        Log.i(TAG, "mNotePosition: " + mNotePosition);
         mNote = DataManager.getInstance().getNotes().get(mNotePosition);
     }
 
@@ -177,6 +183,7 @@ public class NoteActivity extends AppCompatActivity {
         // realizamos la action de salvar el trabajo del usuario en onPause
         // metodo de ACTIVITY que es llamado cuando el usuario deja la ACTIVITY
         if(mIsCancelling){
+            Log.i(TAG, "Cancelling note at position: " + mNotePosition);
             if(mIsNewNote){
                 DataManager.getInstance().removeNote(mNotePosition);
             }else{
@@ -186,6 +193,7 @@ public class NoteActivity extends AppCompatActivity {
         }else{
             saveNote();
         }
+        Log.d(TAG, "onPause");
     }
 
     private void storePreviousNoteValues() {
