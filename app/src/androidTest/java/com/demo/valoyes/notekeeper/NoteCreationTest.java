@@ -14,8 +14,10 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.*;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.Matchers.*;
 import static android.support.test.espresso.Espresso.pressBack;
 
@@ -66,8 +68,25 @@ public class NoteCreationTest {
         onView(withId(R.id.text_note_title)).perform(typeText(NOTE_TITLE));
         onView(withId(R.id.text_note_text)).perform(typeText(NOTE_TEXT), closeSoftKeyboard());
 
+        // assert
+        // estos asserts en particular no son realmente necesarios, debido a que podemos confiar
+        // en que typeText() hace bien su trabajo
+        onView(withId(R.id.text_note_text)).check(matches(withText(containsString(NOTE_TEXT))));
+        onView(withId(R.id.text_note_title)).check(matches(withText(containsString(NOTE_TITLE))));
+        // tambien podemos verificar que lo que muestra el spinner es el course title
+        onView(withId(R.id.spinner_courses)).check(matches(withSpinnerText(containsString(course.getTitle()))));
+
         // 4.
         pressBack();
+
+        // assert
+        // verificamos que la que sea la ultima nota corresponde a los valores de los input string
+        int noteIndex = sDataManager.getNotes().size() - 1;
+        NoteInfo note = sDataManager.getNotes().get(noteIndex);
+        assertEquals(NOTE_TEXT, note.getText());
+        assertEquals(NOTE_TITLE, note.getTitle());
+        assertEquals(course, note.getCourse());
+
     }
 
 }
